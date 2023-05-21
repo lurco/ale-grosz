@@ -1,10 +1,14 @@
-import {Outlet} from "react-router-dom";
+import { Outlet } from 'react-router-dom';
+import {Container} from "@mui/material";
+import NavBar from "../NavBar/NavBar.tsx";
 
 function Layout() {
     return (
         <>
-            <h2>Menu</h2>
-            <Outlet />
+            <NavBar />
+            <Container maxWidth="lg">
+                <Outlet />
+            </Container>
         </>
     );
 }
