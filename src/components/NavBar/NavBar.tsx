@@ -21,9 +21,14 @@ const pages = [
         link: '/',
     },
     {
+        name: 'Add product',
+        link: '/add-product',
+    },
+    {
         name: 'Contact',
         link: '/contact',
     },
+
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
