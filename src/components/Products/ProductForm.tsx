@@ -12,20 +12,24 @@ interface Kind {
 }
 
 interface Category extends Kind {
-    subcategories: Kind[]
+    subcategories: Array<Kind | undefined>
 }
 
-async function getKind(endpoint: string){
+interface CategoryApi extends Kind {
+    subcategories: number[]
+}
+
+async function getKind<T>(endpoint: string): Promise<T[]>{
     const response = await fetch(`/api/v1/${endpoint}`);
 
     return response.json();
 }
 
-async function getCategoriesWithSubcategories(){
+async function getCategoriesWithSubcategories(): Promise<Category[]>{
 
     const response = await Promise.all([
-        getKind('categories'),
-        getKind('subcategories')
+        getKind<CategoryApi>('categories'),
+        getKind<Kind>('subcategories')
     ])
 
     const [categories, subcategories] = response;
@@ -41,7 +45,8 @@ async function getCategoriesWithSubcategories(){
 function ProductForm() {
 
     const [categories, setCategories] = useState<Category[]>([]);
-
+    const [subcategories, setSubcategories] = useState<Kind[]>([]);
+    
     useEffect(() => {
         getCategoriesWithSubcategories().then(setCategories);
     }, [])
@@ -54,13 +59,23 @@ function ProductForm() {
             image: '',
             stockCount: 0,
             barcode: '',
-            category: '',
-            subcategory: '',
+            category: '0',
+            subcategory: '0',
         },
         onSubmit: (values) => {
             alert(JSON.stringify(values, null, 2));
         },
     });
+
+    function updateSubcategories(selectedCategory: string) {
+        const selectedCategoryObj = categories
+            .find((category) => category.id === parseInt(selectedCategory));
+
+        if(selectedCategoryObj !== undefined) {
+            const subcategoriesFiltered = selectedCategoryObj.subcategories.filter(Boolean) as Kind[];
+            setSubcategories(subcategoriesFiltered);
+        }
+    }
 
     return (
         <Box sx={{ my: '20px' }}>
@@ -131,17 +146,29 @@ function ProductForm() {
                                 name="category"
                                 value={formik.values.category}
                                 label="category"
-                                onChange={formik.handleChange}
+                                onChange={(e) => {
+                                    formik.handleChange(e);
+                                    updateSubcategories(e.target.value);
+                                    formik.values.subcategory = "0";
+                                }}
                             >
-                                <MenuItem value="Computers">Computers</MenuItem>
-                                <MenuItem value="Consoles">Consoles</MenuItem>
-                                <MenuItem value="Monitors">Monitors</MenuItem>
+                                <MenuItem value="0">---</MenuItem>
+                                {categories.map((category) => (
+                                    <MenuItem
+                                        value={category.id}
+                                        key={category.id}
+                                    >
+                                        {category.name}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
                     <Grid xs={12}>
                         <FormControl fullWidth>
-                            <InputLabel id="subcategoryLbl">Subcategory</InputLabel>
+                            <InputLabel id="subcategoryLbl">
+                                Subcategory
+                            </InputLabel>
                             <Select
                                 labelId="subcategoryLbl"
                                 id="subcategory"
@@ -150,9 +177,15 @@ function ProductForm() {
                                 label="subcategory"
                                 onChange={formik.handleChange}
                             >
-                                <MenuItem value={10}>Computers</MenuItem>
-                                <MenuItem value={20}>Consoles</MenuItem>
-                                <MenuItem value={30}>Monitors</MenuItem>
+                                <MenuItem value="0">---</MenuItem>
+                                {subcategories.map((subcategory) => (
+                                    <MenuItem
+                                        value={subcategory.id}
+                                        key={subcategory.id}
+                                    >
+                                        {subcategory.name}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
