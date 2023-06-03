@@ -1,5 +1,50 @@
 {
-  "products": [],
+  "products": [
+    {
+      "name": "Smartphone X",
+      "description": "A high-end smartphone with advanced features.",
+      "price": 999.99,
+      "image": "https://example.com/images/smartphone_x.jpg",
+      "stockCount": 10,
+      "barcode": "1234567890",
+      "category": 3,
+      "subcategory": 4,
+      "id": 1
+    },
+    {
+      "name": "Telefon",
+      "description": "Telefon opis",
+      "price": 3,
+      "image": "",
+      "stockCount": 4,
+      "barcode": "1324124",
+      "category": 3,
+      "subcategory": 8,
+      "id": 2
+    },
+    {
+      "name": "Komputer",
+      "description": "Opis",
+      "price": 23,
+      "image": "",
+      "stockCount": 34,
+      "barcode": "2354235",
+      "category": 3,
+      "subcategory": 8,
+      "id": 3
+    },
+    {
+      "name": "Telefon",
+      "description": "Opis",
+      "price": 34,
+      "image": "",
+      "stockCount": 23,
+      "barcode": "235252",
+      "category": 2,
+      "subcategory": 4,
+      "id": 4
+    }
+  ],
   "categories": [
     {
       "id": 1,
