@@ -1,11 +1,13 @@
-import { useFormik } from 'formik';
-import {TextField, Box, Select, Button, FormControl, InputLabel, MenuItem, Alert} from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
-import DropInput from './DropInput.tsx';
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {NavigateFunction, useNavigate} from "react-router-dom";
+// TODO: refactor code for GRID v1
+import {Alert, Box, Button, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 
-// [{id, name, subcategories: [{id, name}]}]
+import {useFormik} from 'formik';
+
+import DropInput from './DropInput.tsx';
+import {Product, ProductWithoutId} from "../../types/product.ts";
 
 interface Kind {
     id: number,
@@ -19,19 +21,6 @@ interface Category extends Kind {
 interface CategoryApi extends Kind {
     subcategories: number[]
 }
-
-interface Product {
-    "name": string,
-    "description": string,
-    "price": number,
-    "image": string,
-    "stockCount": number,
-    "barcode": string,
-    "category": number,
-    "subcategory": number
-}
-
-type ProductId = { id: number };
 
 async function getKind<T>(endpoint: string): Promise<T[]>{
     const response = await fetch(`/api/v1/${endpoint}`);
@@ -56,7 +45,7 @@ async function getCategoriesWithSubcategories(): Promise<Category[]>{
     }))
 }
 
-async function addProduct(endpoint: string, product: Product): Promise<Product & ProductId>{
+async function addProduct(endpoint: string, product: ProductWithoutId): Promise<Product>{
     const response = await fetch(`/api/v1/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -68,10 +57,10 @@ async function addProduct(endpoint: string, product: Product): Promise<Product &
     return response.json();
 }
 
-function delay(timer: number, fn: Function, ...args: any[]): Promise<number>{
+function delay(timer: number, fn: NavigateFunction, arg: string): Promise<number> {
     return new Promise((resolve) => {
         const interval = setTimeout(() => {
-            fn(...args);
+            fn(arg);
         }, timer)
         resolve(interval);
     })

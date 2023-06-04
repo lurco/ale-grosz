@@ -1,7 +1,8 @@
-import {createBrowserRouter} from "react-router-dom";
-import Layout from "./components/layout/Layout.tsx";
-import ProductForm from "./components/Products/ProductForm.tsx";
-import ProductDetails from "./components/Products/ProductDetails.tsx";
+import { createBrowserRouter } from 'react-router-dom';
+import Layout from './components/layout/Layout.tsx';
+import ProductForm from './components/Products/ProductForm.tsx';
+import ProductDetails from './components/Products/ProductDetails.tsx';
+import { Home } from './components/Home.tsx';
 
 export const router = createBrowserRouter([
     {
@@ -10,24 +11,24 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <h1>Home</h1>
+                element: <Home />,
             },
             {
                 path: '/contact',
-                element: <h1>Contact</h1>
+                element: <h1>Contact</h1>,
             },
             {
                 path: '/add-product',
-                element: <ProductForm />
+                element: <ProductForm />,
             },
             {
-                path: '/products/:id',
-                element: <ProductDetails />
-            }
-        ]
+                path: '/products/:productId',
+                element: <ProductDetails />,
+            },
+        ],
     },
     {
         path: '/registration',
-        element: <h1>Registration</h1>
-    }
-])
+        element: <h1>Registration</h1>,
+    },
+]);
