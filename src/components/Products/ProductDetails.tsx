@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {ChangeEvent, useContext, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import {faker} from "@faker-js/faker";
@@ -7,14 +7,15 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import {Card} from "@mui/material"
+import {Card, TextField} from "@mui/material"
 import {CardMedia} from "@mui/material";
 import Typography from "@mui/material/Typography";
 
-import {Product, ProductWithCategoriesAndSubcategories} from '../../types/product.ts';
+import {Product, ProductCart, ProductWithCategoriesAndSubcategories} from '../../types/product.ts';
 import {Loader} from '../Feedback/Loader.tsx';
 import {CategoriesContext} from "../../context/CategoriesContext.ts";
 import {Category} from "../../types/category.ts";
+import {CartContext} from "../../context/CartContext.ts";
 
 async function getProduct(
     endpoint: string,
@@ -51,6 +52,9 @@ function ProductDetails() {
     const {productId} = useParams();
     const [product, setProduct] = useState<ProductWithCategoriesAndSubcategories | null>(null);
     const categories = useContext(CategoriesContext);
+    const [cartProducts, setCartProducts] = useContext(CartContext);
+
+    const [quantity, setQuantity] = useState(1);
 
     const navigate = useNavigate();
 
@@ -78,6 +82,31 @@ function ProductDetails() {
                 deleted: true,
             },
         });
+    }
+
+    function addToCart() {
+
+        if(!product){
+            throw new Error('No product');
+        }
+
+        let cartProduct = cartProducts.find(({id}) => id === product.id);
+
+        if(cartProduct === undefined){
+            cartProduct = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity
+            } as ProductCart
+
+            setCartProducts([...cartProducts, cartProduct]);
+
+        } else {
+            cartProduct.quantity += quantity;
+
+            setCartProducts([...cartProducts]);
+        }
     }
 
     if (!product) {
@@ -123,7 +152,14 @@ function ProductDetails() {
                                 <Typography variant="h4">
                                     price: ${product.price}
                                 </Typography>
-                                <Button variant="contained">
+                                <TextField
+                                    id="quantity"
+                                    type="number"
+                                    label="Quantity"
+                                    value={quantity}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setQuantity(+e.target.value)}
+                                />
+                                <Button variant="contained" onClick={addToCart}>
                                     Buy now
                                 </Button>
                             </Paper>

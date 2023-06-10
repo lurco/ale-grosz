@@ -4,14 +4,17 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import { router } from './router.tsx';
 import CategoriesProvider from "./components/Providers/CategoriesProvider.tsx";
+import CartProvider from "./components/Providers/CartProvider.tsx";
 
 function App() {
     return (
         <>
             <CssBaseline />
-            <CategoriesProvider>
-                <RouterProvider router={router}/>
-            </CategoriesProvider>
+            <CartProvider>
+                <CategoriesProvider>
+                    <RouterProvider router={router}/>
+                </CategoriesProvider>
+            </CartProvider>
         </>
     );
 }

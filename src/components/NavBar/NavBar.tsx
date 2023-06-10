@@ -16,6 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { faker } from '@faker-js/faker';
+import CartTotal from "../Cart/CartTotal.tsx";
 
 const pages = [
     {
@@ -214,6 +215,10 @@ function NavBar() {
                                 </Button>
                             </Link>
                         ))}
+                    </Box>
+
+                    <Box sx={{flexGrow: 1, textAlign: "right", paddingRight: 5}}>
+                        <CartTotal />
                     </Box>
 
                     <Box sx={{ flexGrow: 0 }}>
