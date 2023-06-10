@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useContext, useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 
 import {faker} from "@faker-js/faker";
 
@@ -7,19 +7,37 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import { Card } from "@mui/material"
+import {Card} from "@mui/material"
 import {CardMedia} from "@mui/material";
 import Typography from "@mui/material/Typography";
 
-import { Product } from '../../types/product.ts';
-import { Loader } from '../Feedback/Loader.tsx';
+import {Product, ProductWithCategoriesAndSubcategories} from '../../types/product.ts';
+import {Loader} from '../Feedback/Loader.tsx';
+import {CategoriesContext} from "../../context/CategoriesContext.ts";
+import {Category} from "../../types/category.ts";
 
 async function getProduct(
     endpoint: string,
     signal: AbortSignal
 ): Promise<Product> {
-    const response = await fetch(`/api/v1/${endpoint}`, { signal });
+    const response = await fetch(`/api/v1/${endpoint}`, {signal});
     return response.json();
+}
+
+function addCategoryNamesToProduct(product: Product, categories: Category[] | null): ProductWithCategoriesAndSubcategories {
+    const category = categories ? categories
+        .find((category) => category.id === product.category) : undefined;
+
+    if (category === undefined) {
+        throw new Error(`Cannot find category with id: ${product.category}`);
+    }
+
+    return {
+        ...product,
+        category,
+        subcategory: category.subcategories
+            .find((subcategory) => product.subcategory === subcategory?.id)
+    }
 }
 
 async function deleteProduct(endpoint: string): Promise<Record<string, never>> {
@@ -30,27 +48,27 @@ async function deleteProduct(endpoint: string): Promise<Record<string, never>> {
 }
 
 function ProductDetails() {
-    const { productId } = useParams();
-    const [product, setProduct] = useState<Product | null>(null);
+    const {productId} = useParams();
+    const [product, setProduct] = useState<ProductWithCategoriesAndSubcategories | null>(null);
+    const categories = useContext(CategoriesContext);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const controller = new AbortController();
 
-        if (productId !== undefined) {
+        if (productId !== undefined && categories) {
             getProduct(`products/${productId}`, controller.signal).then(
-                setProduct
+                (product) => {
+                    setProduct(addCategoryNamesToProduct(product, categories));
+                }
             );
-        } else {
-            // TODO: create error boundary for this component
-            throw new Error(`Invalid query params id: ${productId}`);
         }
 
         return () => {
             controller.abort();
         };
-    }, [productId]);
+    }, [productId, categories]);
 
     async function handleDelete() {
         await deleteProduct(`products/${productId}`);
@@ -63,32 +81,32 @@ function ProductDetails() {
     }
 
     if (!product) {
-        return <Loader />;
+        return <Loader/>;
     }
 
     return (
-        <Box sx={{ my: '20px' }}>
+        <Box sx={{my: '20px'}}>
             <Grid spacing={2} container>
                 <Grid item xs={12}>
                     <Typography variant="h1" gutterBottom>
                         {product.name}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
-                        {product.category}/{product.subcategory}
+                        {product.category?.name}/{product.subcategory?.name}
                     </Typography>
-                    <Grid container spacing={2} xs={12}>
+                    <Grid container spacing={2}>
                         <Grid item xs={6}>
 
-                        <Card sx={{maxWidth: 645}}>
-                            <CardMedia
-                                sx={{height: 440}}
-                                image={faker.image.urlLoremFlickr({
-                                    category: 'technics',
-                                })}
-                                title={product.name}
-                            />
-                        </Card>
-                    </Grid>
+                            <Card sx={{maxWidth: 645}}>
+                                <CardMedia
+                                    sx={{height: 440}}
+                                    image={faker.image.urlLoremFlickr({
+                                        category: 'technics',
+                                    })}
+                                    title={product.name}
+                                />
+                            </Card>
+                        </Grid>
                         <Grid item xs={6}>
                             <Paper
                                 elevation={1}
@@ -103,8 +121,8 @@ function ProductDetails() {
                                 style={{padding: 10, display: "flex", gap: "10px", marginBottom: 20}}
                             >
                                 <Typography variant="h4">
-                                price: ${product.price}
-                            </Typography>
+                                    price: ${product.price}
+                                </Typography>
                                 <Button variant="contained">
                                     Buy now
                                 </Button>
@@ -119,7 +137,6 @@ function ProductDetails() {
                             </Paper>
                         </Grid>
                     </Grid>
-
 
 
                 </Grid>

@@ -5,10 +5,12 @@ import {Category, CategoryApi, Kind} from "../../types/category.ts";
 import {getData} from "../../api/api.ts";
 
 async function getCategoriesAndSubcategories(signal: AbortSignal): Promise<Category[]> {
-    const [categories, subcategories] = await Promise.all([
+    const response: [CategoryApi[], Kind[]] = await Promise.all([
         getData<CategoryApi>({endpoint: '/categories', signal}),
         getData<Kind>({endpoint: '/subcategories', signal})
     ]);
+
+    const [categories, subcategories] = response;
 
     return categories.map((category) => ({
         ...category,
@@ -18,8 +20,9 @@ async function getCategoriesAndSubcategories(signal: AbortSignal): Promise<Categ
     }));
 }
 
+
 function CategoriesProvider({children}: PropsWithChildren) {
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Category[] | null>(null);
 
     useEffect(() => {
         const controller = new AbortController();
