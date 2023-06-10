@@ -1,31 +1,16 @@
+import {useEffect, useState} from 'react';
+import {useLocation, useSearchParams} from 'react-router-dom';
+
 import Grid from '@mui/material/Grid';
-import {
-    Alert,
-    FormControl,
-    InputLabel,
-    Select,
-    SelectChangeEvent,
-} from '@mui/material';
-import Box from '@mui/material/Box';
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { Product, ProductWithCategories } from '../types/product.ts';
-import { ApiType } from '../types/api.ts';
-import { CategoryApi, Kind } from '../types/category.ts';
-import { Search } from './Inputs/Search.tsx';
-import ProductList from './Products/ProductList.tsx';
+import {Alert, FormControl, InputLabel, Select, SelectChangeEvent,} from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
 
-async function getData<T>({ endpoint, signal }: ApiType): Promise<T[]> {
-    const init: { signal?: AbortSignal } = {};
-
-    if (signal !== undefined) {
-        init.signal = signal;
-    }
-
-    const response = await fetch(`/api/v1/${endpoint}`, init);
-    return response.json();
-}
+import {Product, ProductWithCategories} from '../types/product.ts';
+import {CategoryApi, Kind} from '../types/category.ts';
+import {Search} from './Inputs/Search.tsx';
+import ProductList from './Products/ProductList.tsx';
+import {getData} from "../api/api.ts";
 
 async function getProductsWithCategories(
     signal: AbortSignal
@@ -53,7 +38,7 @@ function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [products, setProducts] = useState<ProductWithCategories[]>([]);
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState(searchParams.get('query') || '');
     const [sortParam, setSortParam] = useState<string>(
         searchParams.get('sortBy') || ''
     );
@@ -73,15 +58,15 @@ function HomePage() {
     }, []);
 
     useEffect(() => {
-        // TODO: create query params for search products
-        const queryParams: { sortBy?: string } = {};
+        const queryParams: { sortBy?: string; query?: string } = {};
 
-        if (sortParam) {
+        if (sortParam || query) {
             queryParams.sortBy = sortParam;
+            queryParams.query = query;
         }
 
         setSearchParams(queryParams);
-    }, [sortParam]);
+    }, [sortParam, query]);
 
     // TODO: create loader
 

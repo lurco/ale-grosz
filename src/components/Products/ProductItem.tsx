@@ -1,8 +1,12 @@
+import {Link} from "react-router-dom";
+
 import { Card, CardActions, CardContent, CardMedia, Chip } from '@mui/material';
-import { faker } from '@faker-js/faker';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+
+import { faker } from '@faker-js/faker';
+
 import { ProductWithCategories } from '../../types/product.ts';
 
 type ProductItemProps = {
@@ -38,7 +42,11 @@ function ProductItem({ product }: ProductItemProps) {
                     />
                 </CardContent>
                 <CardActions>
-                    <Button size="small">More info</Button>
+                    <Link to={`/products/${product.id}`}>
+                        <Button size="small">
+                            More info
+                        </Button>
+                    </Link>
                 </CardActions>
             </Card>
         </Grid>
