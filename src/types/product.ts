@@ -1,3 +1,5 @@
+import { CategoryApi, Kind } from './category.ts';
+
 export interface Product {
     name: string;
     description: string;
@@ -10,4 +12,10 @@ export interface Product {
     id: number;
 }
 
-export type ProductWithoutId = Omit<Product, "id">;
+export type ProductWithoutId = Omit<Product, 'id'>;
+
+export interface ProductWithCategories
+    extends Omit<Product, 'category' | 'subcategory'> {
+    category: CategoryApi | undefined;
+    subcategory: Kind | undefined;
+}

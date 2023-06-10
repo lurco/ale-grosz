@@ -1,17 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { Product } from '../../types/product.ts';
+import { useEffect, useState } from 'react';
+import { Loader } from '../Feedback/Loader.tsx';
 import Button from '@mui/material/Button';
 
-import { Product } from '../../types/product.ts';
-import { Loader } from '../Feedback/Loader.tsx';
-
-async function getProduct<T>(
+async function getProduct(
     endpoint: string,
     signal: AbortSignal
-): Promise<T> {
-    const response = await fetch(`/api/v1/${endpoint}`);
-
+): Promise<Product> {
+    const response = await fetch(`/api/v1/${endpoint}`, { signal });
     return response.json();
 }
 
@@ -19,38 +16,37 @@ async function deleteProduct(endpoint: string): Promise<Record<string, never>> {
     const response = await fetch(`/api/v1/${endpoint}`, {
         method: 'DELETE',
     });
-
     return response.json();
 }
 
 function ProductDetails() {
-    const { productId } = useParams();
+    const { id } = useParams();
     const [product, setProduct] = useState<Product | null>(null);
+
     const navigate = useNavigate();
 
     useEffect(() => {
         const controller = new AbortController();
 
-        if (productId !== undefined) {
-            getProduct(`products/${productId}`, controller.signal).then(
-                setProduct
-            );
+        if (id !== undefined) {
+            getProduct(`products/${id}`, controller.signal).then(setProduct);
         } else {
-            //     TODO: create ErrorBoundary
-            throw new Error(
-                `Issue with routing: invalid query params' id ${productId}`
-            );
+            // TODO: create error boundary for this component
+            throw new Error(`Invalid query params id: ${id}`);
         }
 
         return () => {
             controller.abort();
         };
-    }, [productId]);
+    }, [id]);
 
     async function handleDelete() {
-        await deleteProduct(`products/${productId}`);
-        navigate('/', {
-            state: { productName: product?.name as string, deleted: true },
+        await deleteProduct(`products/${id}`);
+        navigate(`/`, {
+            state: {
+                productName: product?.name as string,
+                deleted: true,
+            },
         });
     }
 
@@ -59,12 +55,12 @@ function ProductDetails() {
     }
 
     return (
-        <>
-            <h1>{product.name}</h1>
-            <Button variant="outlined" onClick={handleDelete}>
+        <div>
+            Product: {product.name}
+            <Button variant="contained" onClick={handleDelete}>
                 Delete
             </Button>
-        </>
+        </div>
     );
 }
 
