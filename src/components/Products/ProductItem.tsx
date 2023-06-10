@@ -7,13 +7,36 @@ import Grid from '@mui/material/Grid';
 
 import { faker } from '@faker-js/faker';
 
-import { ProductWithCategories } from '../../types/product.ts';
+import {ProductCart, ProductWithCategories} from '../../types/product.ts';
+import {useContext} from "react";
+import {CartContext} from "../../context/CartContext.ts";
 
 type ProductItemProps = {
     product: ProductWithCategories;
 };
 
 function ProductItem({ product }: ProductItemProps) {
+    const [cartProducts, setCartProducts] = useContext(CartContext);
+    function addToCartQuick(){
+        let cartProduct = cartProducts.find(({id}) => id === product.id);
+
+        if(cartProduct === undefined){
+            cartProduct = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: 1
+            } as ProductCart
+
+            setCartProducts([...cartProducts, cartProduct]);
+
+        } else {
+            cartProduct.quantity += 1;
+
+            setCartProducts([...cartProducts]);
+        }
+    }
+
     return (
         <Grid item xs={4}>
             <Card sx={{ maxWidth: 345 }}>
@@ -41,12 +64,28 @@ function ProductItem({ product }: ProductItemProps) {
                         variant="outlined"
                     />
                 </CardContent>
-                <CardActions>
+                <CardActions
+                    style={{
+                    display: "flex",
+                        justifyContent: "space-between"
+                }}
+                >
                     <Link to={`/products/${product.id}`}>
-                        <Button size="small">
+                        <Button
+                            size="small"
+                            variant="outlined"
+                        >
                             More info
                         </Button>
                     </Link>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        onClick={addToCartQuick}
+                    >
+                        Quick buy
+                    </Button>
                 </CardActions>
             </Card>
         </Grid>
