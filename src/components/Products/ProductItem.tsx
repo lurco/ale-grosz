@@ -15,9 +15,11 @@ type ProductItemProps = {
     handleAddToWatchlist: () => void;
     handleAddToCart: (product: ProductCart) => void;
     handleCancelProduct: (product: ProductWithCart) => void;
+    category: string;
+    handleSelectCategory: (category: string) => void;
 };
 
-function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCancelProduct}: ProductItemProps) {
+function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCancelProduct, category, handleSelectCategory}: ProductItemProps) {
     function addToCartQuick() {
         handleAddToCart({
             id: product.id,
@@ -46,8 +48,9 @@ function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCanc
                 <CardContent>
                     <Chip
                         label={product.category?.name}
-                        variant="outlined"
+                        variant={category !== product?.category?.name ? "outlined" : "filled"}
                         sx={{mr: 1}}
+                        onClick={() => handleSelectCategory(product?.category?.name || '')}
                     />
                     <Chip
                         label={product.subcategory?.name}
@@ -73,7 +76,7 @@ function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCanc
                                 textDecoration: "none"
                             }}
                         >
-                            Details
+                            details
                         </Link>
                     </Button>
                     <Button
@@ -81,6 +84,7 @@ function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCanc
                         size="small"
                         onClick={handleAddToWatchlist}
                     >
+                        {/* TODO: create unwatch */}
                         +watch
                     </Button>
                     <Button

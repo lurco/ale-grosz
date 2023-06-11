@@ -89,7 +89,7 @@ function ProductDetails() {
         if(!product){
             throw new Error('No product');
         }
-
+        // TODO: fix types
         let cartProduct = cartProducts.find(({id}) => id === product.id);
 
         if(cartProduct === undefined){

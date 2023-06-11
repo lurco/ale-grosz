@@ -1,4 +1,4 @@
-import {useEffect, useState, memo} from 'react';
+import {useEffect, useState, memo, useContext} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
 import Grid from '@mui/material/Grid';
@@ -8,11 +8,13 @@ import Box from '@mui/material/Box';
 
 import {Search} from './Inputs/Search.tsx';
 import ProductList from './Products/ProductList.tsx';
+import {CategoriesContext} from "../context/CategoriesContext.ts";
 
 function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [query, setQuery] = useState(searchParams.get('query') || '');
+    const [category, setCategory] = useState(searchParams.get('categories') || '');
     const [sortParam, setSortParam] = useState<string>(
         searchParams.get('sortBy') || ''
     );
@@ -21,6 +23,7 @@ function HomePage() {
     const [msg, setMsg] = useState<boolean | undefined>(
         location.state?.deleted
     );
+    const categories = useContext(CategoriesContext);
 
     useEffect(() => {
         const queryParams: { sortBy?: string; query?: string } = {};
@@ -37,6 +40,10 @@ function HomePage() {
 
     function handleSortPrice(e: SelectChangeEvent) {
         setSortParam(e.target.value);
+    }
+
+    function handleFilterCategory(e: SelectChangeEvent){
+        setCategory(e.target.value);
     }
 
     return (
@@ -78,10 +85,31 @@ function HomePage() {
                         </Select>
                     </FormControl>
                 </Grid>
+                <Grid item xs={12}>
+                    <FormControl fullWidth sx={{ mb: 4 }}>
+                        <InputLabel id="categoriesLabel">
+                            Filter by category
+                        </InputLabel>
+                        <Select
+                            labelId="categoriesLabel"
+                            id="categories"
+                            value={category}
+                            label="Choose category"
+                            onChange={handleFilterCategory}
+                        >
+                            <MenuItem value={''}>---</MenuItem>
+                            {categories && categories.map(({name, id}) => (
+                                <MenuItem value={name} key={id}>{name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
                 <Grid container spacing={2}>
                     <ProductList
                         query={query}
                         sortParam={sortParam}
+                        category={category}
+                        setCategory={setCategory}
                     />
                 </Grid>
             </Grid>
