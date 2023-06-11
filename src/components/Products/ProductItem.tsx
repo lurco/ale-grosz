@@ -1,12 +1,12 @@
 import {memo} from "react";
 import {Link} from "react-router-dom";
 
-import { Card, CardActions, CardContent, CardMedia, Chip } from '@mui/material';
+import {Card, CardActions, CardContent, CardMedia, Chip} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
-import { faker } from '@faker-js/faker';
+import {faker} from '@faker-js/faker';
 
 import {ProductCart, ProductWithCart} from '../../types/product.ts';
 
@@ -14,10 +14,11 @@ type ProductItemProps = {
     product: ProductWithCart;
     handleAddToWatchlist: () => void;
     handleAddToCart: (product: ProductCart) => void;
+    handleCancelProduct: (product: ProductWithCart) => void;
 };
 
-function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: ProductItemProps) {
-    function addToCartQuick(){
+function ProductItem({product, handleAddToWatchlist, handleAddToCart, handleCancelProduct}: ProductItemProps) {
+    function addToCartQuick() {
         handleAddToCart({
             id: product.id,
             name: product.name,
@@ -26,29 +27,11 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
         });
     }
 
-    console.log('magic');
-    function cancelProduct(){
-        // const updatedCart: ProductCart[] = [];
-        //
-        // for (const cartProduct of cartProducts || []){
-        //     if(cartProduct.id !== product.id){
-        //         updatedCart.push(cartProduct);
-        //     } else {
-        //         if(cartProduct.quantity > 1){
-        //             cartProduct.quantity -= 1;
-        //             updatedCart.push(cartProduct);
-        //         }
-        //     }
-        // }
-        //
-        // setCartProducts(updatedCart);
-    }
-
     return (
         <Grid item xs={4}>
-            <Card sx={{ maxWidth: 345 }}>
+            <Card sx={{maxWidth: 345}}>
                 <CardMedia
-                    sx={{ height: 140 }}
+                    sx={{height: 140}}
                     image={faker.image.urlLoremFlickr({
                         category: 'technics',
                     })}
@@ -58,13 +41,13 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
                     <Typography gutterBottom variant="h5" component="div">
                         {product.name}
                     </Typography>
-                    <Chip label={`$${product.price}`} variant="filled" />
+                    <Chip label={`$${product.price}`} variant="filled"/>
                 </CardContent>
                 <CardContent>
                     <Chip
                         label={product.category?.name}
                         variant="outlined"
-                        sx={{ mr: 1 }}
+                        sx={{mr: 1}}
                     />
                     <Chip
                         label={product.subcategory?.name}
@@ -73,24 +56,32 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
                 </CardContent>
                 <CardActions
                     style={{
-                    display: "flex",
-                        justifyContent: "space-between"
-                }}
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                        alignItems: "stretch"
+                    }}
                 >
-                    <Link to={`/products/${product.id}`}>
-                        <Button
-                            size="small"
-                            variant="outlined"
+                    <Button
+                        size="small"
+                        variant="outlined"
+                    >
+                        <Link
+                            to={`/products/${product.id}`}
+                            style={{
+                                color: "inherit",
+                                textDecoration: "none"
+                            }}
                         >
-                            More info
-                        </Button>
-                    </Link>
+                            Details
+                        </Link>
+                    </Button>
                     <Button
                         variant="contained"
                         size="small"
                         onClick={handleAddToWatchlist}
                     >
-                        Add to watchlist
+                        +watch
                     </Button>
                     <Button
                         variant="contained"
@@ -98,14 +89,16 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
                         size="small"
                         onClick={addToCartQuick}
                     >
-                        Quick buy
+                        buy
                     </Button>
                     {product.isInCart && (
                         <Button
                             variant="contained"
                             color="warning"
                             size="small"
-                            onClick={cancelProduct}
+                            onClick={() => {
+                                handleCancelProduct(product);
+                            }}
                         >
                             Undo
                         </Button>

@@ -30,12 +30,16 @@ function ProductList({query, sortParam}: ProductListProps) {
 
     useEffect(() => {
         setProducts(products.map((product) => {
-            if(product?.isInCart){
-                return product;
-            } else if(cartProducts && cartProducts.some(({id}) => id === product.id)){
-                return {...product, isInCart: true}
+
+            if(cartProducts && cartProducts.some(({id}) => id === product.id)){
+                if(product.isInCart === true){
+                    return product;
+                }
+                return {...product, isInCart: true};
+            } else if(product.isInCart === true) {
+                return {...product, isInCart: false};
             }
-            return product
+            return product;
         }));
     }, [cartProducts])
 
@@ -59,6 +63,25 @@ function ProductList({query, sortParam}: ProductListProps) {
         })
 
     }, [setCartProducts])
+
+    const handleCancelProduct = useCallback(function (product: ProductWithCart) {
+        setCartProducts((prevState: LocalStorageValue<ProductCart[]> | undefined): LocalStorageValue<ProductCart[]> => {
+            const updatedCart: ProductCart[] = [];
+
+            for (const cartProduct of prevState || []){
+                if(cartProduct.id !== product.id){
+                    updatedCart.push(cartProduct);
+                } else {
+                    if(cartProduct.quantity > 1){
+                        cartProduct.quantity -= 1;
+                        updatedCart.push(cartProduct);
+                    }
+                }
+            }
+
+            return updatedCart;
+        });
+    },[])
 
     return (
         <>
@@ -91,6 +114,7 @@ function ProductList({query, sortParam}: ProductListProps) {
                         key={product.id}
                         handleAddToWatchlist={handleAddToWatchlist}
                         handleAddToCart={handleAddToCart}
+                        handleCancelProduct={handleCancelProduct}
                     />
                 ))}
         </>
