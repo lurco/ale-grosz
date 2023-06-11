@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, memo} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
 import Grid from '@mui/material/Grid';
@@ -125,4 +125,6 @@ function HomePage() {
     );
 }
 
-export default HomePage;
+const HomePageMemoized = memo(HomePage);
+
+export default HomePageMemoized;

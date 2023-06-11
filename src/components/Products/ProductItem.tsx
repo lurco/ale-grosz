@@ -1,3 +1,4 @@
+import {memo} from "react";
 import {Link} from "react-router-dom";
 
 import { Card, CardActions, CardContent, CardMedia, Chip } from '@mui/material';
@@ -8,33 +9,44 @@ import Grid from '@mui/material/Grid';
 import { faker } from '@faker-js/faker';
 
 import {ProductCart, ProductWithCategories} from '../../types/product.ts';
-import {useContext} from "react";
-import {CartContext} from "../../context/CartContext.ts";
 
 type ProductItemProps = {
     product: ProductWithCategories;
+    handleAddToWatchlist: () => void;
+    handleAddToCart: (product: ProductCart) => void;
 };
 
-function ProductItem({ product }: ProductItemProps) {
-    const [cartProducts, setCartProducts] = useContext(CartContext);
+function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: ProductItemProps) {
     function addToCartQuick(){
-        let cartProduct = cartProducts.find(({id}) => id === product.id);
+        handleAddToCart({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1
+        });
+    }
 
-        if(cartProduct === undefined){
-            cartProduct = {
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                quantity: 1
-            } as ProductCart
+    function isInCart(): boolean{
+        return false;
+        // return cartProducts !== undefined ? cartProducts.some(({id}) => id === product.id) : false;
+    }
 
-            setCartProducts([...cartProducts, cartProduct]);
-
-        } else {
-            cartProduct.quantity += 1;
-
-            setCartProducts([...cartProducts]);
-        }
+    console.log('magic');
+    function cancelProduct(){
+        // const updatedCart: ProductCart[] = [];
+        //
+        // for (const cartProduct of cartProducts || []){
+        //     if(cartProduct.id !== product.id){
+        //         updatedCart.push(cartProduct);
+        //     } else {
+        //         if(cartProduct.quantity > 1){
+        //             cartProduct.quantity -= 1;
+        //             updatedCart.push(cartProduct);
+        //         }
+        //     }
+        // }
+        //
+        // setCartProducts(updatedCart);
     }
 
     return (
@@ -80,16 +92,35 @@ function ProductItem({ product }: ProductItemProps) {
                     </Link>
                     <Button
                         variant="contained"
+                        size="small"
+                        onClick={handleAddToWatchlist}
+                    >
+                        Add to watchlist
+                    </Button>
+                    <Button
+                        variant="contained"
                         color="success"
                         size="small"
                         onClick={addToCartQuick}
                     >
                         Quick buy
                     </Button>
+                    {isInCart() && (
+                        <Button
+                            variant="contained"
+                            color="warning"
+                            size="small"
+                            onClick={cancelProduct}
+                        >
+                            Undo
+                        </Button>
+                    )}
                 </CardActions>
             </Card>
         </Grid>
     );
 }
 
-export default ProductItem;
+const ProductItemMemoized = memo(ProductItem);
+
+export default ProductItemMemoized;

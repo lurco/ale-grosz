@@ -1,8 +1,8 @@
-import {createContext} from "react";
+import {createContext, Dispatch, SetStateAction} from "react";
 import {ProductCart} from "../types/product.ts";
 import {LocalStorageValue} from "../types/localStorage.ts";
 
-export const CartContext = createContext<[LocalStorageValue<ProductCart[]>, (value: ProductCart[]) => void] >([
+export const CartContext = createContext<[LocalStorageValue<ProductCart[]>, Dispatch<SetStateAction<LocalStorageValue<ProductCart[]>>>] >([
 
     [
         {
