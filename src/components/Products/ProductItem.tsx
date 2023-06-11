@@ -8,10 +8,10 @@ import Grid from '@mui/material/Grid';
 
 import { faker } from '@faker-js/faker';
 
-import {ProductCart, ProductWithCategories} from '../../types/product.ts';
+import {ProductCart, ProductWithCart} from '../../types/product.ts';
 
 type ProductItemProps = {
-    product: ProductWithCategories;
+    product: ProductWithCart;
     handleAddToWatchlist: () => void;
     handleAddToCart: (product: ProductCart) => void;
 };
@@ -24,11 +24,6 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
             price: product.price,
             quantity: 1
         });
-    }
-
-    function isInCart(): boolean{
-        return false;
-        // return cartProducts !== undefined ? cartProducts.some(({id}) => id === product.id) : false;
     }
 
     console.log('magic');
@@ -105,7 +100,7 @@ function ProductItem({ product, handleAddToWatchlist, handleAddToCart }: Product
                     >
                         Quick buy
                     </Button>
-                    {isInCart() && (
+                    {product.isInCart && (
                         <Button
                             variant="contained"
                             color="warning"

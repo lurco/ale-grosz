@@ -6,38 +6,12 @@ import {Alert, FormControl, InputLabel, Select, SelectChangeEvent,} from '@mui/m
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 
-import {Product, ProductWithCategories} from '../types/product.ts';
-import {CategoryApi, Kind} from '../types/category.ts';
 import {Search} from './Inputs/Search.tsx';
 import ProductList from './Products/ProductList.tsx';
-import {getData} from "../api/api.ts";
-
-async function getProductsWithCategories(
-    signal: AbortSignal
-): Promise<ProductWithCategories[]> {
-    const response = await Promise.all([
-        getData<Product>({ endpoint: 'products', signal }),
-        getData<CategoryApi>({ endpoint: 'categories', signal }),
-        getData<Kind>({ endpoint: 'subcategories', signal }),
-    ]);
-
-    const [products, categories, subcategories] = response;
-
-    return products.map((product) => ({
-        ...product,
-        category: categories.find(
-            (category) => product.category === category.id
-        ),
-        subcategory: subcategories.find(
-            (subcategory) => product.subcategory === subcategory.id
-        ),
-    }));
-}
 
 function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [products, setProducts] = useState<ProductWithCategories[]>([]);
     const [query, setQuery] = useState(searchParams.get('query') || '');
     const [sortParam, setSortParam] = useState<string>(
         searchParams.get('sortBy') || ''
@@ -47,15 +21,6 @@ function HomePage() {
     const [msg, setMsg] = useState<boolean | undefined>(
         location.state?.deleted
     );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        getProductsWithCategories(controller.signal).then(setProducts);
-
-        return () => {
-            controller.abort();
-        };
-    }, []);
 
     useEffect(() => {
         const queryParams: { sortBy?: string; query?: string } = {};
@@ -115,7 +80,6 @@ function HomePage() {
                 </Grid>
                 <Grid container spacing={2}>
                     <ProductList
-                        products={products}
                         query={query}
                         sortParam={sortParam}
                     />
